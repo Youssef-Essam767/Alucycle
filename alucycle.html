@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alucycle Platform</title>
+    <link rel="stylesheet" href="https://jsdelivr.net" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #1a1a1a; color: #e0e0e0; min-height: 100vh; overflow-x: hidden; }
+        .page-section { display: none; width: 100%; min-height: 100vh; padding-bottom: 50px; }
+        .page-section.active { display: block !important; }
+        .navbar { display: none; justify-content: space-between; align-items: center; padding: 30px 60px; }
+        .nav-logo { font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #fff; cursor: pointer; }
+        .nav-links button { background: transparent; color: #fff; border: 1px solid #fff; padding: 8px 24px; margin-left: 15px; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.3s; }
+        #login-page { background: linear-gradient(to bottom, #7443aa, #441c7a, #1a0933); }
+        .login-screen { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); padding: 40px; width: 100%; max-width: 400px; border-radius: 16px; text-align: center; margin: 100px auto; border: 1px solid rgba(255,255,255,0.1); }
+        .fname { width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; margin-bottom: 15px; outline: none; }
+        .login-btn { width: 100%; padding: 12px; background: #fff; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; }
+        .hero-section { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; max-width: 1300px; margin: 40px auto; padding: 0 60px; }
+        .hero-title { font-size: 64px; font-weight: 400; line-height: 1.1; color: #fff; }
+        .gradient-text { background: linear-gradient(45deg, #a8ffb2, #f9e2ae); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .points-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 4px; max-width: 400px; margin-top: 30px; }
+        .points-count { font-size: 48px; font-weight: 300; margin-bottom: 15px; }
+        .news-card { background: rgba(255,255,255,0.02); border-left: 2px solid #a8ffb2; padding: 20px; margin-bottom: 20px; }
+        .scanner-card { background: white; color: #333; padding: 40px; border-radius: 12px; max-width: 500px; margin: 40px auto; text-align: center; }
+        .drop-zone { border: 2px dashed #ccc; padding: 40px; margin: 20px 0; border-radius: 8px; cursor: pointer; position: relative; display: block; }
+        #preview-img { width: 100%; max-height: 200px; object-fit: contain; display: none; margin-bottom: 10px; }
+        .book-container { max-width: 1100px; margin: 50px auto; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; position: relative; }
+        .book-container::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.1); }
+        .book-page { padding: 60px; }
+        .toast { position: fixed; top: 30px; right: -400px; background: #fff3cd; color: #856404; padding: 16px; border-radius: 4px; transition: 0.4s; z-index: 3000; font-weight: 600; }
+        .toast.show { right: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">⚠️ Notification</div>
+
+    <section id="login-page" class="page-section active">
+        <form class="login-screen" onsubmit="event.preventDefault(); showPage('home-page');">
+            <h1 style="color:#fff; margin-bottom:20px;">Alucycle</h1>
+            <input type="text" class="fname" placeholder="Username" required>
+            <input type="password" class="fname" placeholder="Password" required>
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+    </section>
+
+    <nav class="navbar" id="main-nav">
+        <div class="nav-logo" onclick="showPage('home-page')">ALUCYCLE</div>
+        <div class="nav-links">
+            <button type="button" onclick="showPage('home-page')">Home</button>
+            <button type="button" onclick="showPage('scanner-page')">Scanner</button>
+            <button type="button" onclick="showPage('info-page')">Info</button>
+            <button type="button" onclick="location.reload()" style="border-color: #f44336; color: #f44336;">Logout</button>
+        </div>
+    </nav>
+
+    <section id="home-page" class="page-section">
+        <div class="hero-section">
+            <div>
+                <h1 class="hero-title">Recycling <br><span class="gradient-text">never ends</span></h1>
+                <div class="points-box">
+                    <div style="font-size:12px; color:#a0a0a0;">CURRENT BALANCE</div>
+                    <div class="points-count" id="home-pts">0 Points</div>
+                    <button type="button" class="login-btn" style="background:#1D9E75; color:#fff;" onclick="showPage('scanner-page')">Get Points</button>
+                    <button type="button" class="login-btn" style="background:transparent; border:1px solid #333; color:#fff; margin-top:10px;" onclick="redeem()">Redeem Points</button>
+                </div>
+            </div>
+            <div class="news-column">
+                <h2 style="font-size:14px; letter-spacing:2px; margin-bottom:25px;">GLOBAL RECYCLING NEWS</h2>
+                <div class="news-card"><h3>Ocean Cleanup</h3><p>50 tons removed this month.</p></div>
+                <div class="news-card"><h3>Europe 2030</h3><p>Commitment to zero-waste cities.</p></div>
+                <div class="news-card"><h3>Aluminum Rise</h3><p>Recycled metal value hits record high.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="scanner-page" class="page-section">
+        <div class="scanner-card">
+            <h3>Scanner</h3>
+            <label class="drop-zone">
+                <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="previewFile()">
+                <img id="preview-img" style="width:100%; display:none;">
+                <div id="drop-text"><i class="ti ti-camera" style="font-size:40px;"></i><p>Select Image</p></div>
+            </label>
+            <button type="button" class="login-btn" style="background:#1D9E75; color:#fff;" onclick="processScan()">Submit Verification</button>
+            <p style="font-size:11px; color:#999; margin-top:15px;">Limit: 50 Points</p>
+        </div>
+    </section>
+
+    <section id="info-page" class="page-section">
+        <div class="book-container">
+            <div class="book-page">
+                <h2 class="gradient-text">The Mission</h2>
+                <p style="font-size:14px; line-height:1.8; color:#b0b0b0;">Alucycle transforms domestic recycling into a digital asset.You said: make me a info about an app abot recycle cans and the name of it is alucycleAluCycle is a mobile application designed to reward users for recycling aluminum cans.📱 OverviewAluCycle connects individuals with local recycling centers to turn waste into rewards. Users scan, drop off, and track their environmental impact through a gamified interface.✨ Key FeaturesSmart Scanner:  a rewarding, gamified experience. By bridging the gap between eco-conscious consumers and local recycling centers, the app allows users to scan their empty beverage cans, locate nearby drop-off hubs, and instantly earn cash, digital coupons, or charitable donation points. Beyond financial incentives, AluCycle features a personalized impact tracker that visualizes real-time carbon footprint reductions, transforming everyday waste management into a collaborative, community-driven effort to build a circular economy.</p>
+            </div>
+            <div class="book-page">
+                <h2 class="gradient-text">The Process</h2>
+                <p style="font-size:14px; line-height:1.8; color:#b0b0b0;">Aluminum is 100% infinitely recyclable.Uses AI to verify aluminum material and bar codes.Map Locator: Points users to the nearest affiliated recycling hubs.Digital Wallet: Converts recycled cans into cash, coupons, or charity donations.Impact Tracker: Shows real-time statistics on carbon footprint reduction.Leaderboards: Hosts community challenges to encourage friendly competition.💸 How It WorksCollect: Gather empty aluminum beverage cans.Scan: Scan the cans using the app camera.Drop: Deposit items at an AluCycle partner location.Earn: Receive instant points or cash in the app.🌍 Target AudienceEco-conscious individualsStudents looking for extra pocket moneySustainability-driven businessesLocal recycling centers seeking more volumeTo help me refine this concept, tell me:What operating systems will it launch on (iOS, Android, or both)?Do you want to focus on cash rewards or store discounts?What is the geographic location for the initial launch?I can adapt this text into a marketing pitch, a store description, or a functional feature list based on your goals.5 sitesUS20120047080A1 - Waste Management and Recycling Tracking SystemThe system locates the nearest recycling facilities (participating and not participating in system) to the user's project and disp...Google PatentsFrequently Asked QuestionsWe provide a recycling platform for users to find the nearest recycle bins and exchange their recyclables for reward coins, Touch ...nucycle.com.myHow best to recycle aluminium drink cansHow best to recycle aluminium drink cans Rinse and clean the cans: Empty and rinse the cans to remove any remaining liquid or resi...UK VendingShow allYou said: write a paragraphAluCycle is an innovative mobile application that transforms aluminum recycling into</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let pts = 0;
+        const limit = 50;
+
+        function showPage(id) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            
+            const nav = document.getElementById('main-nav');
+            nav.style.display = (id === 'login-page') ? 'none' : 'flex';
+            window.scrollTo(0,0);
+        }
+
+        function previewFile() {
+            const file = document.getElementById('file-input').files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const img = document.getElementById('preview-img');
+                img.src = reader.result;
+                img.style.display = 'block';
+                document.getElementById('drop-text').style.display = 'none';
+            }
+            if (file) reader.readAsDataURL(file);
+        }
+
+        function processScan() {
+            if (!document.getElementById('file-input').files[0]) {
+                notify("Select image first!", "#f44336", "#fff");
+                return;
+            }
+            if (pts >= limit) {
+                notify("Limit reached (50 pts)!", "#ff9800", "#fff");
+                return;
+            }
+            pts += 10;
+            document.getElementById('home-pts').innerText = pts + " Points";
+            notify("Added +10 Points!", "#fff3cd", "#856404");
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('drop-text').style.display = 'block';
+            document.getElementById('file-input').value = "";
+        }
+
+        function redeem() {
+            if (pts < 20) { notify("Need 20 pts!", "#ff9800", "#fff"); }
+            else { pts -= 20; document.getElementById('home-pts').innerText = pts + " Points"; notify("Redeemed -20 pts!", "#1D9E75", "#fff"); }
+        }
+
+        function notify(msg, bg, color) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.background = bg; t.style.color = color;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
